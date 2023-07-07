@@ -1,3 +1,2 @@
-/stent.vtk
-/stent_nogap.vtk
-/stent_nogap_open.vtk
+*.vtk
+*.txt

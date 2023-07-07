@@ -1,10 +1,10 @@
 
-L = 10
+L = 29
 R = 4
-r = 0.06
-nbWires = 24
-nbNodesCell = 4
-nbCells = 10
+r = 0.065
+nbWires = 12
+nbNodesCell = 10
+nbCells = 28
 nbInters = nbCells*2+1
 ϕ = L/nbCells
 
@@ -17,7 +17,7 @@ for n in 1:nbWires
     θ = (n-1)*(2*pi/nbWires)
 
     i = 1 
-    for j in nbNodesCell/2+1:nbNodesCell+1
+    for j in nbNodesCell/2+1:nbNodesCell
 
         A = R 
         Θ = θ + pi/nbWires*(i-1) + pi/(nbWires*nbNodesCell)*(j-1)
@@ -36,7 +36,7 @@ for n in 1:nbWires
     end
 
     for i in 2:nbInters-1
-        for j in 1:nbNodesCell+1
+        for j in 1:nbNodesCell
 
             A = R 
             Θ = θ + pi/nbWires*(i-1) + pi/(nbWires*nbNodesCell)*(j-1)
@@ -80,7 +80,7 @@ for n in 1:nbWires
     θ = (n-1)*(2*pi/nbWires)
 
     i = 1 
-    for j in nbNodesCell/2+1:nbNodesCell+1
+    for j in nbNodesCell/2+1:nbNodesCell
 
         A = R 
         Θ = θ - pi/nbWires*(i-1) - pi/(nbWires*nbNodesCell)*(j-1)
@@ -99,7 +99,7 @@ for n in 1:nbWires
     end
 
     for i in 2:nbInters-1
-        for j in 1:nbNodesCell+1
+        for j in 1:nbNodesCell
 
             A = R 
             Θ = θ - pi/nbWires*(i-1) - pi/(nbWires*nbNodesCell)*(j-1)
@@ -139,11 +139,17 @@ for n in 1:nbWires
 
 end 
 
-pos_mat = reshape(reinterpret(Float64, pos), (3, length(pos)))'
-max_z = maximum(pos_mat[:,3])
-min_z = minimum(pos_mat[:,3])
-pos_mat[:,3] = L.*(pos_mat[:,3].-min_z)./(max_z - min_z)
-pos = [Vec3(pos_mat[i,1],pos_mat[i,2],pos_mat[i,3]) for i in 1:size(pos_mat,1)]
+# pos_mat = reshape(reinterpret(Float64, pos), (3, length(pos)))'
+# max_z = maximum(pos_mat[:,3])
+# min_z = minimum(pos_mat[:,3])
+# pos_mat[:,3] = L.*(pos_mat[:,3].-min_z)./(max_z - min_z)
+# pos = [Vec3(pos_mat[i,1],pos_mat[i,2],pos_mat[i,3]) for i in 1:size(pos_mat,1)]
+# pos .-= ([0,0,L/2],)
 
 write_vtk_configuration("stent_nogap_open.vtk", pos, conn)
 
+writedlm("pos.txt", pos)
+writedlm("conn.txt", conn)
+
+constr = get_nodespairs_stent(pos)
+writedlm("constr.txt", constr)

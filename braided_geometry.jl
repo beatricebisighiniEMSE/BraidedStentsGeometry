@@ -13,9 +13,11 @@ push!(nodeID, 1)
 conn = Vector{Vec2{Int}}()
 
 for n in 1:nbWires
+    
     θ = (n-1)*(2*pi/nbWires)
+    
     for i in 1:nbInters
-        for j in 1:nbNodesCell+1
+        for j in 1:nbNodesCell
             a(j) = !iseven(i) * (2*r/nbNodesCell*(j-1)) + iseven(i) * (2*r - 2*r/nbNodesCell*(j-1))
             A = R  + a(j)
             Θ = θ + pi/nbWires*(i-1) + pi/(nbWires*nbNodesCell)*(j-1)
@@ -33,12 +35,30 @@ for n in 1:nbWires
             push!(nodeID, nodeID[end]+1)
         end
     end 
+
+    i = nbInters
+    j = nbNodesCell +1 
+    a = !iseven(i) * (2*r/nbNodesCell*(j-1)) + iseven(i) * (2*r - 2*r/nbNodesCell*(j-1))
+    A = R + a
+    Θ = θ + pi/nbWires*(i-1) + pi/(nbWires*nbNodesCell)*(j-1)
+
+    x = A * cos(Θ)
+    y = A * sin(Θ)
+    z = R*pi*(i-1)/(nbWires*tan(ϕ)) + R*pi*(j-1)/(nbWires*nbNodesCell*tan(ϕ))
+
+    push!(pos, [x, y, z])
+
+    if (i-1)*nbNodesCell + j > 1
+        push!(conn, [nodeID[end-1], nodeID[end]]) 
+    end 
+
+    push!(nodeID, nodeID[end]+1)
 end 
 
 for n in 1:nbWires
     θ = (n-1)*(2*pi/nbWires)
     for i in 1:nbInters
-        for j in 1:nbNodesCell+1
+        for j in 1:nbNodesCell
             a(j) = iseven(i) * (2*r/nbNodesCell*(j-1)) + !iseven(i) * (2*r - 2*r/nbNodesCell*(j-1))
             A = R + a(j)
             Θ = θ - pi/nbWires*(i-1) - pi/(nbWires*nbNodesCell)*(j-1)
@@ -56,6 +76,25 @@ for n in 1:nbWires
             push!(nodeID, nodeID[end]+1)
         end
     end 
+
+    i = nbInters
+    j = nbNodesCell +1 
+    a = iseven(i) * (2*r/nbNodesCell*(j-1)) + !iseven(i) * (2*r - 2*r/nbNodesCell*(j-1))
+    A = R + a
+    Θ = θ - pi/nbWires*(i-1) - pi/(nbWires*nbNodesCell)*(j-1)
+
+    x = A * cos(Θ)
+    y = A * sin(Θ)
+    z = R*pi*(i-1)/(nbWires*tan(ϕ)) + R*pi*(j-1)/(nbWires*nbNodesCell*tan(ϕ))
+
+    push!(pos, [x, y, z])
+
+    if (i-1)*nbNodesCell + j > 1
+        push!(conn, [nodeID[end-1], nodeID[end]]) 
+    end 
+
+    push!(nodeID, nodeID[end]+1)
+
 end 
 
 pos_mat = reshape(reinterpret(Float64, pos), (3, length(pos)))'
